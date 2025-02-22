@@ -391,7 +391,7 @@ En este contexto, es evidente que si queremos un mayor nivel de confianza esto i
 Asimismo, esta relación directa entre el margen de error y el intervalo de confianza se puede verificar con la fórmula para el cálculo del margen de error. Como se muestra a continuación, el incremento del nivel de confianza implica aumentar el valor crítico \(Z_{\alpha/2}\), lo que a su vez incrementa el margen de error, ampliando el intervalo. De la misma manera, podemos inferir que, si disminuimos el tamaño de la muestra o aumentamos la variabilidad de los datos poblacionales, el margen de error también aumentaría. Esto se traduce en una mayor incertidumbre en la estimación y una menor precisión.[^6]
 
 <center>
-![Nota: Tabla de elaboración propia](formula.png){width=500}
+![Nota: Tabla de elaboración propia](imagen1.jpg){width=500}
 </center>
 
 [^6]: **Guía de muestreo en R**:Felipe1986. Muestreo en R. RPubs. Recuperado de https://rpubs.com/Felipe1986/MuestreoTutorialR.
