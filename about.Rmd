@@ -302,3 +302,106 @@ cat("Desviación estándar poblacional (σ):", round(desvest_poblacion, 4), "\n"
 cat("Niveles de confianza:", nivel_confianza * 100, "%\n")
 
 ```
+## 2. Calcular valores crítcos 
+
+```{r}
+z_valores <- qnorm(1 - (1 - nivel_confianza) / 2)
+
+tabla_z <- data.frame(
+  Nivel_Confianza = nivel_confianza * 100,
+  Z_Negativo = round(-z_valores, 4),  
+  Z_Positivo = round(z_valores, 4)    
+)
+
+print(tabla_z)
+```
+
+## 3. Cálcular el intervalo de confianza 
+
+```{r}
+#Calcular el margen de error 
+margen_error_ic <- z_valores * (desvest_poblacion/ sqrt(muestra_confianza))
+
+#Se suma a la estimación puntal (media muestral) el margen de error para obtener el los limites inferior y superior 
+
+l_i<- media_muestral - margen_error_ic
+l_s<- media_muestral + margen_error_ic
+```
+
+```{r,echo=FALSE}
+intervalo_confianza <- as.character(paste0("[", round(l_i, 4), ", ", round(l_s, 4), "]"))
+
+interpretacion <- paste("Con un", nivel_confianza * 100, 
+                        "% de confianza, la cantidad promedio de sodio en los cereales está entre", 
+                        round(l_i, 4), "y", round(l_s, 4), "miligramos.")
+
+tabla_IC <- data.frame(
+  Nivel_Confianza = paste0(nivel_confianza * 100, "%"),
+  Margen_Error = round(margen_error_ic, 4),
+  Intervalo = intervalo_confianza,
+  Interpretación = interpretacion
+)
+
+kable(tabla_IC, caption = "Intervalos de Confianza y su Interpretación", align = "c") %>%
+    kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover", "condensed"), 
+                  latex_options = c("hold_position", "scale_down")) %>%
+    column_spec(1, bold = TRUE, border_right = TRUE) %>%
+    column_spec(2, border_left = TRUE, border_right = TRUE) %>%  
+    column_spec(3, border_left = TRUE, border_right = TRUE) %>%
+    column_spec(4, border_left = TRUE, border_right = TRUE) %>%
+    row_spec(0, background = "#D9D9D9", bold = TRUE, extra_css = "border: 1px solid black !important;") %>%  
+    row_spec(1:nrow(tabla_IC), extra_css = "border: 1px solid black !important;")
+```
+
+La próxima gráfica muestra mejor la comparativa de los niveles de confianza y su margen de error: 
+
+```{r,echo=FALSE}
+df_plot <- data.frame(
+  Nivel_Confianza = factor(paste0(nivel_confianza * 100, "%"), levels = paste0(nivel_confianza * 100, "%")),
+  Media = media_muestral,
+  Límite_Inferior = l_i,
+  Límite_Superior = l_s
+)
+
+ggplot(df_plot, aes(x = Media, y = Nivel_Confianza)) +
+  geom_point(size = 4, color = "blue") + 
+  geom_errorbarh(aes(xmin = Límite_Inferior, xmax = Límite_Superior), height = 0.2, color = "red") +  
+  geom_vline(xintercept = media_muestral, linetype = "dashed", color = "black") +  
+  labs(
+    title = "Intervalos de Confianza para la Media de Sodio",
+    x = "Miligramos de Sodio",
+    y = "Nivel de Confianza",
+    caption = "Los puntos representan la media muestral y las líneas rojas los intervalos de confianza."
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 14), 
+    plot.caption = element_text(hjust = 0.5, size = 10), 
+    axis.title.x = element_text(face = "bold"),  
+    axis.title.y = element_text(face = "bold")
+  )
+
+```
+
+
+Como se puede evidenciar, a medida que el nivel de confianza aumenta, el margen de error también se incrementa, ampliando los rangos de estimación. Por ejemplo, con un 90% de confianza, la cantidad promedio de sodio está entre 149.89 y 191.47 mg, mientras que con un 99%, el intervalo se extiende de 138.13 a 203.24 mg. Por tanto, se podría decir queun mayor nivel de confianza ofrece más certeza de que la media real se encuentre dentro del intervalo, pero a costa de perder precisión en la estimación. Por el contrario, un margen de error más pequeño mejora la exactitud, pero con menor certeza.
+
+En este contexto, es evidente que si queremos un mayor nivel de confianza esto implica abarcar un rango más extenso de valores para asegurarnos de que la media poblacional real se encuentre dentro del intervalo, y teniendo en cuenta que el margen de error es lo que se le suma o resta a la estimación puntual, una mayor amplitud del intervalo refleja un margen de error más grande, lo que significa que el valor real tiene más espacio para variar en ambas direcciones.[^7]
+
+Asimismo, esta relación directa entre el margen de error y el intervalo de confianza se puede verificar con la fórmula para el cálculo del margen de error. Como se muestra a continuación, el incremento del nivel de confianza implica aumentar el valor crítico \(Z_{\alpha/2}\), lo que a su vez incrementa el margen de error, ampliando el intervalo. De la misma manera, podemos inferir que, si disminuimos el tamaño de la muestra o aumentamos la variabilidad de los datos poblacionales, el margen de error también aumentaría. Esto se traduce en una mayor incertidumbre en la estimación y una menor precisión.[^6]
+
+<center>
+![Nota: Tabla de elaboración propia](formula.png){width=500}
+</center>
+
+[^6]: **Guía de muestreo en R**:Felipe1986. Muestreo en R. RPubs. Recuperado de https://rpubs.com/Felipe1986/MuestreoTutorialR.
+
+[^7]:**Intervalos de confianza:** Humberto_Mtz_Bta. Intervalos de confianza en R. RPubs. Recuperado de https://rpubs.com/Humberto_Mtz_Bta/903713.
+
+
+
+
+
+
+
+
